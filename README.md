@@ -1,4 +1,4 @@
-# EfficientUnets
+# EfficientUnet
 Keras Implementation of Unet with [EfficientNet](https://arxiv.org/abs/1905.11946) as encoder
 
 - Unet with EfficientNet encoder
@@ -10,7 +10,20 @@ Keras Implementation of Unet with [EfficientNet](https://arxiv.org/abs/1905.1194
   - EfficientNet-B5
   - EfficientNet-B6
   - EfficientNet-B7
+---
+## Requirements
+1. `tensorflow >= 1.13.1`
+2. `Keras >= 2.2.4` (It will automatically be installed when you install `efficientunet`)
 
+---
+## Installation
+Install `efficientunet`:
+
+```bash
+pip install efficientunet
+```
+
+---
 ### Acknowledgment
 0. Some code snippets of EfficientNet are directly borrowed from [this](https://github.com/mingxingtan/efficientnet) repo.
 1. The links of pretrained weights are borrowed from [this](https://github.com/qubvel/efficientnet) repo.
