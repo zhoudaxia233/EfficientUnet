@@ -357,3 +357,38 @@ def MBConvBlock(block_args, global_params, idx, training, drop_connect_rate=None
         return x
 
     return block
+
+
+def freeze_efficientunet_first_n_blocks(model, n):
+    mbblock_nr = 0
+    while True:
+        try:
+            model.get_layer('blocks_{}_output_batch_norm'.format(mbblock_nr))
+            mbblock_nr += 1
+        except ValueError:
+            break
+
+    all_block_names = ['blocks_{}_output_batch_norm'.format(i) for i in range(mbblock_nr)]
+    all_block_index = []
+    for idx, layer in enumerate(model.layers):
+        if layer.name == all_block_names[0]:
+            all_block_index.append(idx)
+            all_block_names.pop(0)
+            if len(all_block_names) == 0:
+                break
+    n_blocks = len(all_block_index)
+
+    if n <= 0:
+        print('n is less than or equal to 0, therefore no layer will be frozen.')
+        return
+    if n > n_blocks:
+        raise ValueError("There are {} blocks in total, n cannot be greater than {}.".format(n_blocks, n_blocks))
+
+    idx_of_last_block_to_be_frozen = all_block_index[n-1]
+    for layer in model.layers[:idx_of_last_block_to_be_frozen+1]:
+        layer.trainable = False
+
+
+def unfreeze_efficientunet(model):
+    for layer in model.layers:
+        layer.trainable = True
