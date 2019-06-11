@@ -7,9 +7,9 @@ import math
 import numpy as np
 
 
-GlobalParams = namedtuple('GlobalParams', ['batch_norm_momentum', 'batch_norm_epsilon', 'dropout_rate', 'data_format',
-                                           'num_classes', 'width_coefficient', 'depth_coefficient', 'depth_divisor',
-                                           'min_depth', 'drop_connect_rate'])
+GlobalParams = namedtuple('GlobalParams', ['batch_norm_momentum', 'batch_norm_epsilon', 'dropout_rate', 'num_classes',
+                                           'width_coefficient', 'depth_coefficient', 'depth_divisor', 'min_depth',
+                                           'drop_connect_rate'])
 GlobalParams.__new__.__defaults__ = (None,) * len(GlobalParams._fields)
 
 BlockArgs = namedtuple('BlockArgs', ['kernel_size', 'num_repeat', 'input_filters', 'output_filters', 'expand_ratio',
@@ -194,23 +194,48 @@ class Swish(layers.Layer):
         return tf.nn.swish(inputs)
 
 
-class ReduceMean(layers.Layer):
-    def call(self, ip, **kwargs):
-        spatial_dims = [1, 2]
-        x = ip
-        return tf.keras.backend.mean(x, spatial_dims, keepdims=True)
+def SEBlock(block_args, **kwargs):
+    num_reduced_filters = max(
+        1, int(block_args.input_filters * block_args.se_ratio))
+    filters = block_args.input_filters * block_args.expand_ratio
 
-    def compute_output_shape(self, input_shape):
-        return input_shape
+    spatial_dims = [1, 2]
 
+    try:
+        block_name = kwargs['block_name']
+    except KeyError:
+        block_name = ''
 
-class SigmoidMul(layers.Layer):
-    def call(self, ip, **kwargs):
-        x, se_expand = ip
-        return tf.sigmoid(se_expand) * x
+    def block(inputs):
+        x = inputs
+        x = layers.Lambda(lambda a: K.mean(a, axis=spatial_dims, keepdims=True))(x)
+        x = layers.Conv2D(
+            num_reduced_filters,
+            kernel_size=[1, 1],
+            strides=[1, 1],
+            kernel_initializer=conv_kernel_initializer,
+            padding='same',
+            name=block_name + 'se_reduce_conv2d',
+            use_bias=True
+        )(x)
 
-    def compute_output_shape(self, input_shape):
-        return input_shape
+        x = Swish(name=block_name + 'se_swish')(x)
+
+        x = layers.Conv2D(
+            filters,
+            kernel_size=[1, 1],
+            strides=[1, 1],
+            kernel_initializer=conv_kernel_initializer,
+            padding='same',
+            name=block_name + 'se_expand_conv2d',
+            use_bias=True
+        )(x)
+
+        x = layers.Activation('sigmoid')(x)
+        out = layers.Multiply()([x, inputs])
+        return out
+
+    return block
 
 
 class DropConnect(layers.Layer):
@@ -304,32 +329,7 @@ def MBConvBlock(block_args, global_params, idx, drop_connect_rate=None):
         x = Swish(name=block_name + 'depthwise_swish')(bn1)
 
         if has_se:
-            num_reduced_filters = max(
-                1, int(block_args.input_filters * block_args.se_ratio))
-            # Squeeze and Excitation layer.
-            se_tensor = ReduceMean()(x)
-
-            se_reduce = layers.Conv2D(
-                num_reduced_filters,
-                kernel_size=[1, 1],
-                strides=[1, 1],
-                kernel_initializer=conv_kernel_initializer,
-                padding='same',
-                name=block_name + 'se_reduce_conv2d',
-                use_bias=True)(se_tensor)
-
-            se_reduce = Swish(name=block_name + 'se_swish')(se_reduce)
-
-            se_expand = layers.Conv2D(
-                filters,
-                kernel_size=[1, 1],
-                strides=[1, 1],
-                kernel_initializer=conv_kernel_initializer,
-                padding='same',
-                name=block_name + 'se_expand_conv2d',
-                use_bias=True)(se_reduce)
-
-            x = SigmoidMul()([x, se_expand])
+            x = SEBlock(block_args, block_name=block_name)(x)
 
         # Output phase
         project_conv = layers.Conv2D(
