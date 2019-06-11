@@ -7,7 +7,7 @@ __all__ = ['get_model_by_name', 'get_efficientnet_b0_encoder', 'get_efficientnet
            'get_efficientnet_b5_encoder', 'get_efficientnet_b6_encoder', 'get_efficientnet_b7_encoder']
 
 
-def _efficientnet(input_shape, blocks_args_list, global_params, training=False):
+def _efficientnet(input_shape, blocks_args_list, global_params):
     batch_norm_momentum = global_params.batch_norm_momentum
     batch_norm_epsilon = global_params.batch_norm_epsilon
 
@@ -47,14 +47,14 @@ def _efficientnet(input_shape, blocks_args_list, global_params, training=False):
         )
 
         # The first block needs to take care of stride and filter size increase.
-        x = MBConvBlock(blocks_args, global_params, idx, training=training, drop_connect_rate=drop_rate_dx * idx)(x)
+        x = MBConvBlock(blocks_args, global_params, idx, drop_connect_rate=drop_rate_dx * idx)(x)
         idx += 1
 
         if blocks_args.num_repeat > 1:
             blocks_args = blocks_args._replace(input_filters=blocks_args.output_filters, strides=[1, 1])
 
         for _ in range(blocks_args.num_repeat - 1):
-            x = MBConvBlock(blocks_args, global_params, idx, training=training, drop_connect_rate=drop_rate_dx * idx)(x)
+            x = MBConvBlock(blocks_args, global_params, idx, drop_connect_rate=drop_rate_dx * idx)(x)
             idx += 1
 
     # Head part
@@ -93,11 +93,11 @@ def _efficientnet(input_shape, blocks_args_list, global_params, training=False):
     return model
 
 
-def get_model_by_name(model_name, input_shape, training, classes=1000, pretrained=False):
+def get_model_by_name(model_name, input_shape, classes=1000, pretrained=False):
     """Get an EfficientNet model by its name.
     """
     blocks_args, global_params = get_efficientnet_params(model_name, override_params={'num_classes': classes})
-    model = _efficientnet(input_shape, blocks_args, global_params, training)
+    model = _efficientnet(input_shape, blocks_args, global_params)
 
     try:
         if pretrained:
@@ -116,40 +116,40 @@ def get_model_by_name(model_name, input_shape, training, classes=1000, pretraine
     return model
 
 
-def _get_efficientnet_encoder(model_name, input_shape, training, pretrained=False):
-    model = get_model_by_name(model_name, input_shape, training, pretrained=pretrained)
+def _get_efficientnet_encoder(model_name, input_shape, pretrained=False):
+    model = get_model_by_name(model_name, input_shape, pretrained=pretrained)
     encoder = models.Model(model.input, model.get_layer('global_average_pooling2d').output)
     encoder.layers.pop()  # remove GAP layer
     return encoder
 
 
-def get_efficientnet_b0_encoder(input_shape, training, pretrained=False):
-    return _get_efficientnet_encoder('efficientnet-b0', input_shape, training, pretrained=pretrained)
+def get_efficientnet_b0_encoder(input_shape, pretrained=False):
+    return _get_efficientnet_encoder('efficientnet-b0', input_shape, pretrained=pretrained)
 
 
-def get_efficientnet_b1_encoder(input_shape, training, pretrained=False):
-    return _get_efficientnet_encoder('efficientnet-b1', input_shape, training, pretrained=pretrained)
+def get_efficientnet_b1_encoder(input_shape, pretrained=False):
+    return _get_efficientnet_encoder('efficientnet-b1', input_shape, pretrained=pretrained)
 
 
-def get_efficientnet_b2_encoder(input_shape, training, pretrained=False):
-    return _get_efficientnet_encoder('efficientnet-b2', input_shape, training, pretrained=pretrained)
+def get_efficientnet_b2_encoder(input_shape, pretrained=False):
+    return _get_efficientnet_encoder('efficientnet-b2', input_shape, pretrained=pretrained)
 
 
-def get_efficientnet_b3_encoder(input_shape, training, pretrained=False):
-    return _get_efficientnet_encoder('efficientnet-b3', input_shape, training, pretrained=pretrained)
+def get_efficientnet_b3_encoder(input_shape, pretrained=False):
+    return _get_efficientnet_encoder('efficientnet-b3', input_shape, pretrained=pretrained)
 
 
-def get_efficientnet_b4_encoder(input_shape, training, pretrained=False):
-    return _get_efficientnet_encoder('efficientnet-b4', input_shape, training, pretrained=pretrained)
+def get_efficientnet_b4_encoder(input_shape, pretrained=False):
+    return _get_efficientnet_encoder('efficientnet-b4', input_shape, pretrained=pretrained)
 
 
-def get_efficientnet_b5_encoder(input_shape, training, pretrained=False):
-    return _get_efficientnet_encoder('efficientnet-b5', input_shape, training, pretrained=pretrained)
+def get_efficientnet_b5_encoder(input_shape, pretrained=False):
+    return _get_efficientnet_encoder('efficientnet-b5', input_shape, pretrained=pretrained)
 
 
-def get_efficientnet_b6_encoder(input_shape, training, pretrained=False):
-    return _get_efficientnet_encoder('efficientnet-b6', input_shape, training, pretrained=pretrained)
+def get_efficientnet_b6_encoder(input_shape, pretrained=False):
+    return _get_efficientnet_encoder('efficientnet-b6', input_shape, pretrained=pretrained)
 
 
-def get_efficientnet_b7_encoder(input_shape, training, pretrained=False):
-    return _get_efficientnet_encoder('efficientnet-b7', input_shape, training, pretrained=pretrained)
+def get_efficientnet_b7_encoder(input_shape, pretrained=False):
+    return _get_efficientnet_encoder('efficientnet-b7', input_shape, pretrained=pretrained)

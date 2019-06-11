@@ -215,10 +215,9 @@ class SigmoidMul(layers.Layer):
 
 class DropConnect(layers.Layer):
 
-    def __init__(self, drop_connect_rate, training):
+    def __init__(self, drop_connect_rate):
         super().__init__()
         self.drop_connect_rate = drop_connect_rate
-        self.training = training
 
     def call(self, inputs, **kwargs):
 
@@ -233,7 +232,7 @@ class DropConnect(layers.Layer):
             output = tf.math.divide(inputs, keep_prob) * binary_tensor
             return output
 
-        return K.in_train_phase(drop_connect(), inputs, training=self.training)
+        return K.in_train_phase(drop_connect(), inputs, training=None)
 
 
 def conv_kernel_initializer(shape, dtype=K.floatx()):
@@ -261,7 +260,7 @@ def dense_kernel_initializer(shape, dtype=K.floatx()):
     return tf.random_uniform(shape, -init_range, init_range, dtype=dtype)
 
 
-def MBConvBlock(block_args, global_params, idx, training, drop_connect_rate=None):
+def MBConvBlock(block_args, global_params, idx, drop_connect_rate=None):
     filters = block_args.input_filters * block_args.expand_ratio
     batch_norm_momentum = global_params.batch_norm_momentum
     batch_norm_epsilon = global_params.batch_norm_epsilon
@@ -351,7 +350,7 @@ def MBConvBlock(block_args, global_params, idx, training, drop_connect_rate=None
             ) and block_args.input_filters == block_args.output_filters:
                 # only apply drop_connect if skip presents.
                 if drop_connect_rate:
-                    x = DropConnect(drop_connect_rate, training)(x)
+                    x = DropConnect(drop_connect_rate)(x)
                 x = layers.add([x, inputs])
 
         return x
