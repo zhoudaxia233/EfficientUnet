@@ -6,7 +6,6 @@ import tensorflow as tf
 import math
 import numpy as np
 
-
 GlobalParams = namedtuple('GlobalParams', ['batch_norm_momentum', 'batch_norm_epsilon', 'dropout_rate', 'num_classes',
                                            'width_coefficient', 'depth_coefficient', 'depth_divisor', 'min_depth',
                                            'drop_connect_rate'])
@@ -15,7 +14,6 @@ GlobalParams.__new__.__defaults__ = (None,) * len(GlobalParams._fields)
 BlockArgs = namedtuple('BlockArgs', ['kernel_size', 'num_repeat', 'input_filters', 'output_filters', 'expand_ratio',
                                      'id_skip', 'strides', 'se_ratio'])
 BlockArgs.__new__.__defaults__ = (None,) * len(BlockArgs._fields)
-
 
 IMAGENET_WEIGHTS = {
 
@@ -41,6 +39,18 @@ IMAGENET_WEIGHTS = {
         'name': 'efficientnet-b3_imagenet_1000.h5',
         'url': 'https://github.com/qubvel/efficientnet/releases/download/v0.0.1/efficientnet-b3_imagenet_1000.h5',
         'md5': 'decd2c8a23971734f9d3f6b4053bf424',
+    },
+
+    'efficientnet-b4': {
+        'name': 'efficientnet-b4_imagenet_1000.h5',
+        'url': 'https://github.com/qubvel/efficientnet/releases/download/v0.0.1/efficientnet-b4_imagenet_1000.h5',
+        'md5': '01df77157a86609530aeb4f1f9527949',
+    },
+
+    'efficientnet-b5': {
+        'name': 'efficientnet-b5_imagenet_1000.h5',
+        'url': 'https://github.com/qubvel/efficientnet/releases/download/v0.0.1/efficientnet-b5_imagenet_1000.h5',
+        'md5': 'c31311a1a38b5111e14457145fccdf32',
     }
 
 }
@@ -250,7 +260,6 @@ class DropConnect(layers.Layer):
         self.drop_connect_rate = drop_connect_rate
 
     def call(self, inputs, **kwargs):
-
         def drop_connect():
             keep_prob = 1.0 - self.drop_connect_rate
 
@@ -290,7 +299,6 @@ def conv_kernel_initializer(shape, dtype=K.floatx()):
 
 
 def dense_kernel_initializer(shape, dtype=K.floatx()):
-
     init_range = 1.0 / np.sqrt(shape[1])
     return tf.random_uniform(shape, -init_range, init_range, dtype=dtype)
 
@@ -393,8 +401,8 @@ def freeze_efficientunet_first_n_blocks(model, n):
     if n > n_blocks:
         raise ValueError("There are {} blocks in total, n cannot be greater than {}.".format(n_blocks, n_blocks))
 
-    idx_of_last_block_to_be_frozen = all_block_index[n-1]
-    for layer in model.layers[:idx_of_last_block_to_be_frozen+1]:
+    idx_of_last_block_to_be_frozen = all_block_index[n - 1]
+    for layer in model.layers[:idx_of_last_block_to_be_frozen + 1]:
         layer.trainable = False
 
 
