@@ -187,11 +187,16 @@ class BlockDecoder(object):
 
 
 class Swish(layers.Layer):
-    def __init__(self, name=None):
-        super().__init__(name=name)
+    def __init__(self, name=None, **kwargs):
+        super().__init__(name=name, **kwargs)
 
     def call(self, inputs, **kwargs):
         return tf.nn.swish(inputs)
+
+    def get_config(self):
+        config = super().get_config()
+        config['name'] = self.name
+        return config
 
 
 def SEBlock(block_args, **kwargs):
@@ -240,8 +245,8 @@ def SEBlock(block_args, **kwargs):
 
 class DropConnect(layers.Layer):
 
-    def __init__(self, drop_connect_rate):
-        super().__init__()
+    def __init__(self, drop_connect_rate, **kwargs):
+        super().__init__(**kwargs)
         self.drop_connect_rate = drop_connect_rate
 
     def call(self, inputs, **kwargs):
@@ -258,6 +263,11 @@ class DropConnect(layers.Layer):
             return output
 
         return K.in_train_phase(drop_connect(), inputs, training=None)
+
+    def get_config(self):
+        config = super().get_config()
+        config['drop_connect_rate'] = self.drop_connect_rate
+        return config
 
 
 def conv_kernel_initializer(shape, dtype=K.floatx()):
