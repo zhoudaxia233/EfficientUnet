@@ -1,9 +1,6 @@
 # EfficientUnet
 Keras Implementation of Unet with [EfficientNet](https://arxiv.org/abs/1905.11946) as encoder
 
-> Note: This library assumes `channels_last` !!!  
-> Note: This library assumes `channels_last` !!!  
-> Note: This library assumes `channels_last` !!!
 - Unet with EfficientNet encoder
   - EfficientNet-B0
   - EfficientNet-B1
@@ -25,6 +22,22 @@ Install `efficientunet`:
 ```bash
 pip install efficientunet
 ```
+
+---
+## Useful notes
+1. This library assumes `channels_last` !
+2. You cannot specify `None` for `input_shape`, since the `input_shape` is heavily used in the code for inferring
+the architecture. (*The EfficientUnets are constructed dynamically*)
+3. Since you cannot use `None` for `input_shape`, the image size for training process and for inference process
+have to be the same.  
+If you do need to use a different image size for inference, a feasible solution is:
+    1. Save the weights of your well-trained model
+    2. Create a new model with the desired input shape
+    3. Load the weights of your well-trained model into this newly created model
+
+4. Due to some rounding problem in TensorFlow (*not so sure*), the input shape should be divisible by 32.  
+e.g. 224x224 is a suitable
+size for input images, but 225x225 is not.
 
 ---
 ## Potential issues
