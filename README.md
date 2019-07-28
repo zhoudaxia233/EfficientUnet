@@ -35,9 +35,9 @@ If you do need to use a different image size for inference, a feasible solution 
     2. Create a new model with the desired input shape
     3. Load the weights of your well-trained model into this newly created model
 
-4. Due to some rounding problem in TensorFlow (*not so sure*), the input shape should be divisible by 32.  
-e.g. 224x224 is a suitable
-size for input images, but 225x225 is not.
+4. Due to some rounding problem in the decoder path (*not a bug, this is a feature* :smirk:), the input shape should be 
+divisible by 32.  
+e.g. 224x224 is a suitable size for input images, but 225x225 is not.
 
 ---
 ## Potential issues
