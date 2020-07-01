@@ -1,5 +1,5 @@
-from keras import models, layers
-from keras.utils import get_file
+from tensorflow.keras import models, layers
+from tensorflow.keras.utils import get_file
 from .utils import *
 
 __all__ = ['get_model_by_name', 'get_efficientnet_b0_encoder', 'get_efficientnet_b1_encoder',
