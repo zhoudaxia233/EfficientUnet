@@ -266,7 +266,7 @@ class DropConnect(layers.Layer):
             # Compute drop_connect tensor
             batch_size = tf.shape(inputs)[0]
             random_tensor = keep_prob
-            random_tensor += tf.random_uniform([batch_size, 1, 1, 1], dtype=inputs.dtype)
+            random_tensor += tf.random.uniform([batch_size, 1, 1, 1], dtype=inputs.dtype)
             binary_tensor = tf.floor(random_tensor)
             output = tf.math.divide(inputs, keep_prob) * binary_tensor
             return output
@@ -294,13 +294,13 @@ def conv_kernel_initializer(shape, dtype=K.floatx()):
     """
     kernel_height, kernel_width, _, out_filters = shape
     fan_out = int(kernel_height * kernel_width * out_filters)
-    return tf.random_normal(
+    return tf.random.normal(
         shape, mean=0.0, stddev=np.sqrt(2.0 / fan_out), dtype=dtype)
 
 
 def dense_kernel_initializer(shape, dtype=K.floatx()):
     init_range = 1.0 / np.sqrt(shape[1])
-    return tf.random_uniform(shape, -init_range, init_range, dtype=dtype)
+    return tf.random.uniform(shape, -init_range, init_range, dtype=dtype)
 
 
 def MBConvBlock(block_args, global_params, idx, drop_connect_rate=None):

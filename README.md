@@ -16,11 +16,26 @@ Keras Implementation of Unet with [EfficientNet](https://arxiv.org/abs/1905.1194
 2. `Keras >= 2.2.4` (It will automatically be installed when you install `efficientunet`)
 
 ---
+## Special Notice
+When I built this, `tensorflow 1.13.1` and `keras 2.2.4` are the latest. There was no `TF2.0`. All the functions and the so-called "best practices" I used in this project may be obsolete. Anyway, this library still works. But please keep in mind, this is built before the advent of `TF2.0`.
+
+---
 ## Installation
 Install `efficientunet`:
 
 ```bash
 pip install efficientunet
+```
+
+---
+## Basic Usage
+
+```bash
+from efficientunet import *
+
+model = get_efficient_unet_b5((224, 224, 3), pretrained=True, block_type='transpose', concat_input=True)
+model.summary()
+
 ```
 
 ---
