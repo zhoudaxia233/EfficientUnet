@@ -1,4 +1,5 @@
-# EfficientUnet with Tensor Flow 2.0 integrated support (thanks to M. Joao that did the changes in https://github.com/marcojoao/EfficientUnet)
+# EfficientUnet with Tensor Flow 2.0 support
+Thanks to M. Joao that did the Tensor Flow integration in https://github.com/marcojoao/EfficientUnet
 Keras Implementation of Unet with [EfficientNet](https://arxiv.org/abs/1905.11946) as encoder
 
 - Unet with EfficientNet encoder
