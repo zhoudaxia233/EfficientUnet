@@ -1,5 +1,5 @@
-from keras.layers import *
-from keras import models
+from tensorflow.keras.layers import *
+from tensorflow.keras import models
 from .efficientnet import *
 from .utils import conv_kernel_initializer
 
@@ -82,7 +82,7 @@ def Conv2DTranspose_block(filters, kernel_size=(3, 3), transpose_kernel_size=(2,
 
 
 # noinspection PyTypeChecker
-def _get_efficient_unet(encoder, out_channels=2, block_type='upsampling', concat_input=True):
+def _get_efficient_unet(encoder, out_channels=2, block_type='upsampling', concat_input=True, activation=None):
     MBConvBlocks = []
 
     skip_candidates = get_blocknr_of_skip_candidates(encoder)
@@ -112,120 +112,129 @@ def _get_efficient_unet(encoder, out_channels=2, block_type='upsampling', concat
         o = UpBlock(32, initializer=conv_kernel_initializer, skip=blocks.pop())(o)
     else:
         o = UpBlock(32, initializer=conv_kernel_initializer, skip=None)(o)
-    o = Conv2D(out_channels, (1, 1), padding='same', kernel_initializer=conv_kernel_initializer)(o)
+
+    o = Conv2D(out_channels, (1, 1), padding='same', activation=activation, kernel_initializer=conv_kernel_initializer)(o)
 
     model = models.Model(encoder.input, o)
 
     return model
 
 
-def get_efficient_unet_b0(input_shape, out_channels=2, pretrained=False, block_type='transpose', concat_input=True):
+def get_efficient_unet_b0(input_shape, out_channels=2, pretrained=False, block_type='transpose', concat_input=True, activation=None):
     """Get a Unet model with Efficient-B0 encoder
     :param input_shape: shape of input (cannot have None element)
     :param out_channels: the number of output channels
     :param pretrained: True for ImageNet pretrained weights
     :param block_type: "upsampling" to use UpSampling layer, otherwise use Conv2DTranspose layer
     :param concat_input: if True, input image will be concatenated with the last conv layer
+    :param activation: activation used by the last conv layer
     :return: an EfficientUnet_B0 model
     """
     encoder = get_efficientnet_b0_encoder(input_shape, pretrained=pretrained)
-    model = _get_efficient_unet(encoder, out_channels, block_type=block_type, concat_input=concat_input)
+    model = _get_efficient_unet(encoder, out_channels, block_type=block_type, concat_input=concat_input, activation=activation)
     return model
 
 
-def get_efficient_unet_b1(input_shape, out_channels=2, pretrained=False, block_type='transpose', concat_input=True):
+def get_efficient_unet_b1(input_shape, out_channels=2, pretrained=False, block_type='transpose', concat_input=True, activation=None):
     """Get a Unet model with Efficient-B1 encoder
     :param input_shape: shape of input (cannot have None element)
     :param out_channels: the number of output channels
     :param pretrained: True for ImageNet pretrained weights
     :param block_type: "upsampling" to use UpSampling layer, otherwise use Conv2DTranspose layer
     :param concat_input: if True, input image will be concatenated with the last conv layer
+    :param activation: activation used by the last conv layer
     :return: an EfficientUnet_B1 model
     """
     encoder = get_efficientnet_b1_encoder(input_shape, pretrained=pretrained)
-    model = _get_efficient_unet(encoder, out_channels, block_type=block_type, concat_input=concat_input)
+    model = _get_efficient_unet(encoder, out_channels, block_type=block_type, concat_input=concat_input, activation=activation)
     return model
 
 
-def get_efficient_unet_b2(input_shape, out_channels=2, pretrained=False, block_type='transpose', concat_input=True):
+def get_efficient_unet_b2(input_shape, out_channels=2, pretrained=False, block_type='transpose', concat_input=True, activation=None):
     """Get a Unet model with Efficient-B2 encoder
     :param input_shape: shape of input (cannot have None element)
     :param out_channels: the number of output channels
     :param pretrained: True for ImageNet pretrained weights
     :param block_type: "upsampling" to use UpSampling layer, otherwise use Conv2DTranspose layer
     :param concat_input: if True, input image will be concatenated with the last conv layer
+    :param activation: activation used by the last conv layer
     :return: an EfficientUnet_B2 model
     """
     encoder = get_efficientnet_b2_encoder(input_shape, pretrained=pretrained)
-    model = _get_efficient_unet(encoder, out_channels, block_type=block_type, concat_input=concat_input)
+    model = _get_efficient_unet(encoder, out_channels, block_type=block_type, concat_input=concat_input, activation=activation)
     return model
 
 
-def get_efficient_unet_b3(input_shape, out_channels=2, pretrained=False, block_type='transpose', concat_input=True):
+def get_efficient_unet_b3(input_shape, out_channels=2, pretrained=False, block_type='transpose', concat_input=True, activation=None):
     """Get a Unet model with Efficient-B3 encoder
     :param input_shape: shape of input (cannot have None element)
     :param out_channels: the number of output channels
     :param pretrained: True for ImageNet pretrained weights
     :param block_type: "upsampling" to use UpSampling layer, otherwise use Conv2DTranspose layer
     :param concat_input: if True, input image will be concatenated with the last conv layer
+    :param activation: activation used by the last conv layer
     :return: an EfficientUnet_B3 model
     """
     encoder = get_efficientnet_b3_encoder(input_shape, pretrained=pretrained)
-    model = _get_efficient_unet(encoder, out_channels, block_type=block_type, concat_input=concat_input)
+    model = _get_efficient_unet(encoder, out_channels, block_type=block_type, concat_input=concat_input, activation=activation)
     return model
 
 
-def get_efficient_unet_b4(input_shape, out_channels=2, pretrained=False, block_type='transpose', concat_input=True):
+def get_efficient_unet_b4(input_shape, out_channels=2, pretrained=False, block_type='transpose', concat_input=True, activation=None):
     """Get a Unet model with Efficient-B4 encoder
     :param input_shape: shape of input (cannot have None element)
     :param out_channels: the number of output channels
     :param pretrained: True for ImageNet pretrained weights
     :param block_type: "upsampling" to use UpSampling layer, otherwise use Conv2DTranspose layer
     :param concat_input: if True, input image will be concatenated with the last conv layer
+    :param activation: activation used by the last conv layer
     :return: an EfficientUnet_B4 model
     """
     encoder = get_efficientnet_b4_encoder(input_shape, pretrained=pretrained)
-    model = _get_efficient_unet(encoder, out_channels, block_type=block_type, concat_input=concat_input)
+    model = _get_efficient_unet(encoder, out_channels, block_type=block_type, concat_input=concat_input, activation=activation)
     return model
 
 
-def get_efficient_unet_b5(input_shape, out_channels=2, pretrained=False, block_type='transpose', concat_input=True):
+def get_efficient_unet_b5(input_shape, out_channels=2, pretrained=False, block_type='transpose', concat_input=True, activation=None):
     """Get a Unet model with Efficient-B5 encoder
     :param input_shape: shape of input (cannot have None element)
     :param out_channels: the number of output channels
     :param pretrained: True for ImageNet pretrained weights
     :param block_type: "upsampling" to use UpSampling layer, otherwise use Conv2DTranspose layer
     :param concat_input: if True, input image will be concatenated with the last conv layer
+    :param activation: activation used by the last conv layer
     :return: an EfficientUnet_B5 model
     """
     encoder = get_efficientnet_b5_encoder(input_shape, pretrained=pretrained)
-    model = _get_efficient_unet(encoder, out_channels, block_type=block_type, concat_input=concat_input)
+    model = _get_efficient_unet(encoder, out_channels, block_type=block_type, concat_input=concat_input, activation=activation)
     return model
 
 
-def get_efficient_unet_b6(input_shape, out_channels=2, pretrained=False, block_type='transpose', concat_input=True):
+def get_efficient_unet_b6(input_shape, out_channels=2, pretrained=False, block_type='transpose', concat_input=True, activation=None):
     """Get a Unet model with Efficient-B6 encoder
     :param input_shape: shape of input (cannot have None element)
     :param out_channels: the number of output channels
     :param pretrained: True for ImageNet pretrained weights
     :param block_type: "upsampling" to use UpSampling layer, otherwise use Conv2DTranspose layer
     :param concat_input: if True, input image will be concatenated with the last conv layer
+    :param activation: activation used by the last conv layer
     :return: an EfficientUnet_B6 model
     """
     encoder = get_efficientnet_b6_encoder(input_shape, pretrained=pretrained)
-    model = _get_efficient_unet(encoder, out_channels, block_type=block_type, concat_input=concat_input)
+    model = _get_efficient_unet(encoder, out_channels, block_type=block_type, concat_input=concat_input, activation=activation)
     return model
 
 
-def get_efficient_unet_b7(input_shape, out_channels=2, pretrained=False, block_type='transpose', concat_input=True):
+def get_efficient_unet_b7(input_shape, out_channels=2, pretrained=False, block_type='transpose', concat_input=True, activation=None):
     """Get a Unet model with Efficient-B7 encoder
     :param input_shape: shape of input (cannot have None element)
     :param out_channels: the number of output channels
     :param pretrained: True for ImageNet pretrained weights
     :param block_type: "upsampling" to use UpSampling layer, otherwise use Conv2DTranspose layer
     :param concat_input: if True, input image will be concatenated with the last conv layer
+    :param activation: activation used by the last conv layer
     :return: an EfficientUnet_B7 model
     """
     encoder = get_efficientnet_b7_encoder(input_shape, pretrained=pretrained)
-    model = _get_efficient_unet(encoder, out_channels, block_type=block_type, concat_input=concat_input)
+    model = _get_efficient_unet(encoder, out_channels, block_type=block_type, concat_input=concat_input, activation=activation)
     return model

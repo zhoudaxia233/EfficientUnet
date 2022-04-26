@@ -1,7 +1,7 @@
 import re
 from collections import namedtuple
-from keras import layers
-import keras.backend as K
+from tensorflow.keras import layers
+import tensorflow.keras.backend as K
 import tensorflow as tf
 import math
 import numpy as np
